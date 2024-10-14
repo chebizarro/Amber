@@ -12,11 +12,13 @@ import com.greenart7c3.nostrsigner.models.TimeUtils
 import com.greenart7c3.nostrsigner.models.kindToNip
 import com.greenart7c3.nostrsigner.service.AmberUtils
 import com.greenart7c3.nostrsigner.service.IntentUtils
+import com.greenart7c3.nostrsigner.service.model.AmberEvent
 import com.vitorpamplona.quartz.crypto.CryptoUtils
 import com.vitorpamplona.quartz.encoders.toHexKey
 import com.vitorpamplona.quartz.encoders.toNpub
 import com.vitorpamplona.quartz.events.Event
 import com.vitorpamplona.quartz.events.LnZapRequestEvent
+
 
 class SignerProvider : ContentProvider() {
     override fun delete(
@@ -115,7 +117,7 @@ class SignerProvider : ContentProvider() {
                 val npub = IntentUtils.parsePubKey(projection[2]) ?: return null
                 if (!LocalPreferences.containsAccount(context!!, npub)) return null
                 val account = LocalPreferences.loadFromEncryptedStorage(context!!, npub) ?: return null
-                val event = Event.fromJson(json)
+                val event = AmberEvent.toEvent(AmberEvent.fromJson(json))
                 val currentSelection = selection ?: "0"
                 val database = NostrSigner.getInstance().getDatabase(account.keyPair.pubKey.toNpub())
                 var permission =
